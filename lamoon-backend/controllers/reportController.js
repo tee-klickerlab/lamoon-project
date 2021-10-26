@@ -3,21 +3,44 @@ const { validationResult } = require("express-validator");
 
 // internal modules
 const db = require("../database/database");
+const functions = require("../common/functions");
+const responses = require("../common/response");
+const queries = require("../common/queries");
+const statics = require("../configs/static");
+const validators = require("../common/validators");
+
+// destructuring modules
+const { STATUS, TABLE, RESPONSE_CODE } = statics;
+const { validateRequest } = validators;
+const { payload, createResponse } = responses;
 const {
-  createResponse,
-  createError,
   isEmpty,
+  isDuplicate,
   noMatchingRow,
   noAffectingRow,
-} = require("../common/functions");
-const { STATUS_SUCCESS, STATUS_ERROR } = require("../configs/static");
+  getArrayLength,
+  incrementCount,
+} = functions;
+const {
+  addQuery,
+  editQuery,
+  deleteQuery,
+  getQuery,
+  getByIdQuery,
+  getDuplicateQuery,
+} = queries;
+
+// constant value
+const { SUCCESS_CODE, ERROR_CODE, NOT_FOUND_CODE } = RESPONSE_CODE;
+const { SUCCESS_STATUS, ERROR_STATUS } = STATUS;
+const { REPORT_TABLE } = TABLE;
 
 addReport = function (req, res) {
   // validate request
-  const errorReq = validationResult(req);
+  const { error, isError } = validateRequest(validationResult(req));
 
-  if (!errorReq.isEmpty()) {
-    return res.status(400).json(createResponse(STATUS_ERROR, errorReq.array()));
+  if (isError) {
+    return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, error));
   }
 
   // check menu by id
@@ -38,159 +61,147 @@ addReport = function (req, res) {
   //   }
   // });
 
-  db.query(
-    `SELECT * FROM reports WHERE name LIKE ?`,
-    `%${req.body.name}%`,
-    (err, result) => {
-      if (err) {
-        return err;
-      } else {
-        const duplicateNameCount = result.length;
-        const isDuplicateName = duplicateNameCount !== 0;
+  const { body } = req;
+  const keywordName = `%${body.name}%`;
 
-        // get request data
-        const dataSet = {
-          ...req.body,
-          menu_id: req.body.menu_id.toString(),
-          name: isDuplicateName
-            ? `${req.body.name} (${duplicateNameCount + 1})`
-            : req.body.name,
-        };
+  db.query(getDuplicateQuery(REPORT_TABLE), keywordName, (err, result) => {
+    if (err) {
+      return err;
+    } else {
+      const menuId = body.menu_id.toString();
+      const duplicateNameCount = getArrayLength(result);
 
-        return (
-          // SQL insert new report
-          db.query("INSERT INTO reports SET ?", dataSet, (err, result) => {
-            if (err) {
-              return res.status(400).json(createResponse(STATUS_ERROR, err));
-            } else {
-              return res
-                .status(200)
-                .json(createResponse(STATUS_SUCCESS, result));
-            }
-          })
-        );
-      }
+      // get request data
+      const dataSet = {
+        ...body,
+        menu_id: menuId,
+        name: isDuplicate(duplicateNameCount)
+          ? `${body.name} (${incrementCount(duplicateNameCount)})`
+          : body.name,
+      };
+
+      return (
+        // SQL insert new report
+        db.query(addQuery(REPORT_TABLE), dataSet, (err, result) => {
+          if (err) {
+            return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+          } else {
+            return createResponse(
+              res,
+              SUCCESS_CODE,
+              payload(SUCCESS_STATUS, result)
+            );
+          }
+        })
+      );
     }
-  );
+  });
 };
 
 getReportList = function (req, res) {
   // SQL get report list
-  db.query("SELECT * FROM reports ORDER BY id asc", (err, result) => {
+  db.query(getQuery(REPORT_TABLE), (err, result) => {
     if (err) {
-      return res.status(400).json(createResponse(STATUS_ERROR, err));
+      return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
     } else {
-      return res.status(200).json(createResponse(STATUS_SUCCESS, result));
+      return createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, result));
     }
   });
 };
 
 getReport = function (req, res) {
   // validate request
-  const errorReq = validationResult(req);
+  const { error, isError } = validateRequest(validationResult(req));
 
-  if (!errorReq.isEmpty()) {
-    return res.status(400).json(createResponse(STATUS_ERROR, errorReq.array()));
+  if (isError) {
+    return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, error));
   }
 
   // get request data
   const id = req.params.id;
 
   // SQL get report by ID
-  db.query(
-    `SELECT * FROM reports WHERE id = ${id} ORDER BY id asc`,
-    (err, result) => {
-      if (err) {
-        return res.status(400).json(createResponse(STATUS_ERROR, err));
-      } else {
-        if (isEmpty(result)) {
-          return res
-            .status(400)
-            .json(createResponse(STATUS_ERROR, createError));
-        }
-        return res.status(200).json(createResponse(STATUS_SUCCESS, result));
+  db.query(getByIdQuery(REPORT_TABLE), id, (err, result) => {
+    if (err) {
+      return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+    } else {
+      if (isEmpty(result)) {
+        return createResponse(res, NOT_FOUND_CODE, payload(ERROR_STATUS));
       }
+      return createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, result));
     }
-  );
+  });
 };
 
 updateReport = function (req, res) {
   // validate request
-  const errorReq = validationResult(req);
+  const { error, isError } = validateRequest(validationResult(req));
 
-  if (!errorReq.isEmpty()) {
-    return res.status(400).json(createResponse(STATUS_ERROR, errorReq.array()));
+  if (isError) {
+    return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, error));
   }
 
-  db.query(
-    `SELECT * FROM reports WHERE name LIKE ?`,
-    `%${req.body.name}%`,
-    (err, result) => {
-      if (err) {
-        return err;
-      } else {
-        const duplicateNameCount = result.length;
-        const isDuplicateName = duplicateNameCount !== 0;
+  const { body, params } = req;
+  const keywordName = `%${body.name}%`;
 
-        // get request data
-        const dataSet = {
-          ...req.body,
-          menu_id: req.body.menu_id.toString(),
-          name: isDuplicateName
-            ? `${req.body.name} (${duplicateNameCount + 1})`
-            : req.body.name,
-        };
-        const id = req.params.id;
+  db.query(getDuplicateQuery(REPORT_TABLE), keywordName, (err, result) => {
+    if (err) {
+      return err;
+    } else {
+      const menuId = body.menu_id.toString();
+      const duplicateNameCount = getArrayLength(result);
 
-        // console.log(dataSet, result);
-        // return res.send("test");
+      // get request data
+      const id = params.id;
+      const dataSet = {
+        ...body,
+        menu_id: menuId,
+        name: isDuplicate(duplicateNameCount)
+          ? `${body.name} (${incrementCount(duplicateNameCount)})`
+          : body.name,
+      };
 
-        return (
-          // SQL update report by ID
-          db.query(
-            `UPDATE reports SET ? WHERE id = ${id}`,
-            dataSet,
-            (err, result) => {
-              if (err) {
-                return res.status(400).json(createResponse(STATUS_ERROR, err));
-              } else {
-                if (noMatchingRow(result)) {
-                  return res
-                    .status(400)
-                    .json(createResponse(STATUS_ERROR, createError));
-                }
-                return res
-                  .status(200)
-                  .json(createResponse(STATUS_SUCCESS, result));
-              }
+      return (
+        // SQL update report by ID
+        db.query(editQuery(REPORT_TABLE), [dataSet, id], (err, result) => {
+          if (err) {
+            return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+          } else {
+            if (noMatchingRow(result)) {
+              return createResponse(res, NOT_FOUND_CODE, payload(ERROR_STATUS));
             }
-          )
-        );
-      }
+            return createResponse(
+              res,
+              SUCCESS_CODE,
+              payload(SUCCESS_STATUS, result)
+            );
+          }
+        })
+      );
     }
-  );
+  });
 };
 
 deleteReport = function (req, res) {
   // validate request
-  const errorReq = validationResult(req);
+  const { error, isError } = validateRequest(validationResult(req));
 
-  if (!errorReq.isEmpty()) {
-    return res.status(400).json(createResponse(STATUS_ERROR, errorReq.array()));
+  if (isError) {
+    return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, error));
   }
 
   // get request data
   const id = req.params.id;
 
   // SQL delete report by ID
-  db.query(`DELETE FROM reports WHERE id = ${id}`, (err, result) => {
+  db.query(deleteQuery(REPORT_TABLE), id, (err, result) => {
     if (err) {
-      return res.status(400).json(createResponse(STATUS_ERROR, err));
+      return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
     } else {
       if (noAffectingRow(result)) {
-        return res.status(400).json(createResponse(STATUS_ERROR, createError));
+        return createResponse(res, NOT_FOUND_CODE, payload(ERROR_STATUS));
       }
-      return res.status(200).json(createResponse(STATUS_SUCCESS, result));
+      return createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, result));
     }
   });
 };

@@ -1,11 +1,11 @@
 const { check, param } = require("express-validator");
 
-const reqParams = [
+const paramsValidator = [
   // validate params, id is required, id must be number type.
   param("id").trim().isNumeric().withMessage("id must be a number"),
 ];
 
-const addMenu = [
+const addMenuValidator = [
   // menu is required, length is less than 100 characters.
   check("menu").trim().notEmpty().isLength({ max: 100 }),
   // cost is required, cost must be number type.
@@ -14,9 +14,9 @@ const addMenu = [
   check("sale").trim().isNumeric().withMessage("sale must be a number"),
 ];
 
-const updateMenu = addMenu.concat(reqParams);
+const updateMenuValidator = addMenuValidator.concat(paramsValidator);
 
-const addReport = [
+const addReportValidator = [
   // menu is required, length is less than 100 characters.
   check("name").trim().notEmpty().isLength({ max: 100 }),
   // sum_cost is required, sum_cost must be number type.
@@ -27,6 +27,18 @@ const addReport = [
   check("menu_id.*").isNumeric().withMessage("menu_id must be array of number"),
 ];
 
-const updateReport = addReport.concat(reqParams);
+const updateReportValidator = addReportValidator.concat(paramsValidator);
 
-module.exports = { addMenu, updateMenu, reqParams, addReport, updateReport };
+const validateRequest = (validateResult) => ({
+  error: validateResult.array(),
+  isError: !validateResult.isEmpty(),
+});
+
+module.exports = {
+  paramsValidator,
+  addMenuValidator,
+  updateMenuValidator,
+  addReportValidator,
+  updateReportValidator,
+  validateRequest,
+};
