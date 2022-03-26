@@ -1,7 +1,9 @@
 const TABLE = {
-  MENU_TABLE: "menus",
-  REPORT_TABLE: "reports",
-  ORDER_TABLE: "orders",
+  MENU_TABLE: "Menus",
+  MENU_PRICE_TABLE: "MenuPrices",
+  REPORT_TABLE: "Reports",
+  ORDER_TABLE: "Orders",
+  ORDER_ITEM_TABLE: "OrderItems",
 };
 
 const STATUS = {
