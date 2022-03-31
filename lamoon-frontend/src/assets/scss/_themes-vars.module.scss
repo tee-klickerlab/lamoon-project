@@ -18,20 +18,20 @@ $view: #242424;
 
 // export
 :export {
-  paper: $paper;
-  paperLight: $paperLight;
+    paper: $paper;
+    paperLight: $paperLight;
 
-  appBar: $appBar;
+    appBar: $appBar;
 
-  textLight: $textLight;
-  textMain: $textMain;
-  textDefault: $textDefault;
+    textLight: $textLight;
+    textMain: $textMain;
+    textDefault: $textDefault;
 
-  success: $success;
-  successLight: $successLight;
+    success: $success;
+    successLight: $successLight;
 
-  alert: $alert;
-  alertLight: $alertLight;
+    alert: $alert;
+    alertLight: $alertLight;
 
-  views: $view;
+    views: $view;
 }
