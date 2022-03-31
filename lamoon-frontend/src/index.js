@@ -13,14 +13,14 @@ import BaseProvider from "contexts/baseContext";
 import "./assets/css/index.css";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <BaseProvider>
-        <App />
-      </BaseProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
+    <React.StrictMode>
+        <BrowserRouter>
+            <BaseProvider>
+                <App />
+            </BaseProvider>
+        </BrowserRouter>
+    </React.StrictMode>,
+    document.getElementById("root")
 );
 
 // If you want to enable client cache, register instead.
