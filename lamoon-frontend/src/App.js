@@ -8,16 +8,17 @@ import Routes from "./routes";
 
 // css
 import "./assets/css/App.css";
+import "./assets/scss/App.scss";
 
 function App() {
-  return (
-    <StyledEngineProvider injectFirst>
-      <CssBaseline />
-      <NavigationScroll>
-        <Routes />
-      </NavigationScroll>
-    </StyledEngineProvider>
-  );
+    return (
+        <StyledEngineProvider injectFirst>
+            <CssBaseline />
+            <NavigationScroll>
+                <Routes />
+            </NavigationScroll>
+        </StyledEngineProvider>
+    );
 }
 
 export default App;

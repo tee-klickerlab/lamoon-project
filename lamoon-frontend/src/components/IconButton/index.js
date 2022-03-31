@@ -1,16 +1,26 @@
-const IconButton = ({ children, color, classes, ...other }) => {
-  const extraClass = classes ? ` ${classes}` : "";
+const IconButton = ({ children, color, classes, wrapper: Wrapper, wrapperProps, ...other }) => {
+    const extraClass = classes ? ` ${classes}` : "";
 
-  return (
-    <button
-      {...other}
-      className={`icon-button${extraClass}`}
-      style={{ backgroundColor: color }}
-      type="button"
-    >
-      {children}
-    </button>
-  );
+    if (Wrapper) {
+        return (
+            <Wrapper {...wrapperProps}>
+                <button
+                    {...other}
+                    className={`icon-button${extraClass}`}
+                    style={{ backgroundColor: color }}
+                    type="button"
+                >
+                    {children}
+                </button>
+            </Wrapper>
+        );
+    } else {
+        return (
+            <button {...other} className={`icon-button${extraClass}`} style={{ backgroundColor: color }} type="button">
+                {children}
+            </button>
+        );
+    }
 };
 
 export default IconButton;
