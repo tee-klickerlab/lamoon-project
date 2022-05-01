@@ -91,12 +91,19 @@ updateOrder = function (req, res) {
   }
 
   // get request data
-  const { name, remark, menuItems, updateDone, isDone } = req.body;
+  const { name, remark, menuItems, updateCheck, checked, checkedName } =
+    req.body;
   const id = req.params.id; // updateDone = true -> id = orderItemID, updateDone = false -> id = orderID
   let sql;
 
-  if (updateDone) {
-    sql = `UPDATE OrderItems oi SET oi.IsDone = ${isDone} WHERE oi.OrderItemID = ${id}`;
+  if (updateCheck) {
+    if (checkedName === "done") {
+      sql = `UPDATE Orders oi SET oi.Done = ${checked} WHERE oi.OrderID = ${id}`;
+    } else if (checkedName === "paid") {
+      sql = `UPDATE Orders oi SET oi.Paid = ${checked} WHERE oi.OrderID = ${id}`;
+    } else {
+      sql = false;
+    }
   } else {
     let cases = "";
     let where = "";

@@ -94,9 +94,21 @@ getMenuById = function (req, res) {
   // get request data
   const id = req.params.id;
 
+  const query = `
+    SELECT * 
+    FROM ${MENU_TABLE} 
+    JOIN ${MENU_PRICE_TABLE} 
+    ON ${MENU_TABLE}.MenuID = ${MENU_PRICE_TABLE}.MenuID AND ${MENU_PRICE_TABLE}.IsActive = 1
+    WHERE ${MENU_TABLE}.MenuID = ?
+    `;
+
   // SQL get menu by ID
-  db.query(getByIdQuery(MENU_TABLE), id, (err, result) => {
-    return createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, "get"));
+  db.query(query, id, (err, result) => {
+    if (err) {
+      return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+    } else {
+      return createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, result));
+    }
   });
 };
 

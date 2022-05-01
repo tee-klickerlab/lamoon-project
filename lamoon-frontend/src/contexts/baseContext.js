@@ -40,7 +40,7 @@ const BaseProvider = ({ children }) => {
     return () => {
       window.removeEventListener("resize", debouncedHandleResize);
     };
-  });
+  }, []);
 
   const baseStore = {
     ...baseContext,

@@ -2,25 +2,27 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
 
 // internal modules
 import App from "./App";
 import reportWebVitals from "./utils/reportWebVitals";
 import * as serviceWorker from "./utils/serviceWorker";
 import BaseProvider from "contexts/baseContext";
+import store from "reduxes";
 
 // css
 import "./assets/css/index.css";
 
 ReactDOM.render(
-    <React.StrictMode>
-        <BrowserRouter>
-            <BaseProvider>
-                <App />
-            </BaseProvider>
-        </BrowserRouter>
-    </React.StrictMode>,
-    document.getElementById("root")
+  <BrowserRouter>
+    <BaseProvider>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BaseProvider>
+  </BrowserRouter>,
+  document.getElementById("root")
 );
 
 // If you want to enable client cache, register instead.

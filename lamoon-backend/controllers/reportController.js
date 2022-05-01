@@ -58,7 +58,7 @@ addReport = function (req, res) {
 };
 
 getReportList = function (req, res) {
-  let query = `SELECT * FROM ${REPORT_TABLE} ORDER BY ReportID ASC`;
+  let query = `SELECT * FROM ${REPORT_TABLE} WHERE IsActive = 1 ORDER BY ReportID ASC`;
 
   // SQL get report list
   db.query(query, (err, result) => {
@@ -87,7 +87,8 @@ const formatResult = (result) => {
       MenuID,
       MenuPriceID,
       Amount,
-      IsDone,
+      Done,
+      Paid,
       MenuName,
       Cost,
       Sale,
@@ -104,14 +105,15 @@ const formatResult = (result) => {
         Cost,
         Sale,
         Amount,
-        IsDone,
       });
     } else {
       formatted.Orders.push({
         OrderID,
         OrderName,
         Remark,
-        Menus: [{ MenuID, MenuName, MenuPriceID, Cost, Sale, Amount, IsDone }],
+        Done,
+        Paid,
+        Menus: [{ MenuID, MenuName, MenuPriceID, Cost, Sale, Amount }],
       });
     }
   });
@@ -133,13 +135,30 @@ getReport = function (req, res) {
   let existQuery = `SELECT * FROM ${REPORT_TABLE} WHERE ReportID = ${id}`;
 
   let joinQuery = `
-    SELECT r.ReportID, r.ReportName, r.Total, o.OrderID, o.OrderName, o.ReportID, o.Remark, oi.*, m.MenuName, mp.Cost, mp.Sale
+    SELECT r.ReportID, r.ReportName, r.Total, o.OrderID, o.OrderName, o.ReportID, o.Remark, o.Paid, o.Done, oi.*, m.MenuName, mp.Cost, mp.Sale
     FROM Reports r
     JOIN Orders o ON r.ReportID = ${id} AND r.ReportID = o.ReportID AND o.IsActive = 1
     JOIN OrderItems oi ON oi.OrderID = o.OrderID AND oi.IsActive = 1
     JOIN Menus m ON oi.MenuID = m.MenuID
     JOIN MenuPrices mp ON mp.MenuPriceID = oi.MenuPriceID
 	  ORDER BY o.OrderName;
+  `;
+
+  let menuQuery = `
+    SELECT 
+      m.MenuID,
+      m.MenuName,
+      mp.Cost,
+      mp.Sale,
+      mp.MenuPriceID
+    FROM Reports r
+    JOIN ReportMenus rm
+    ON r.ReportID = rm.ReportID
+    JOIN Menus m
+    ON rm.MenuID = m.MenuID
+    JOIN MenuPrices mp
+    ON rm.MenuPriceID = mp.MenuPriceID
+    WHERE r.ReportID = ${id} AND rm.IsActive = 1
   `;
 
   // SQL get report by ID
@@ -152,19 +171,34 @@ getReport = function (req, res) {
           if (_err) {
             return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, _err));
           } else {
-            if (_result.length > 0) {
-              return createResponse(
-                res,
-                SUCCESS_CODE,
-                payload(SUCCESS_STATUS, formatResult(_result))
-              );
-            } else {
-              return createResponse(
-                res,
-                SUCCESS_CODE,
-                payload(SUCCESS_STATUS, result)
-              );
-            }
+            db.query(menuQuery, (ferr, fresult) => {
+              if (ferr) {
+                console.log(ferr);
+                return createResponse(
+                  res,
+                  ERROR_CODE,
+                  payload(ERROR_STATUS, _err)
+                );
+              } else {
+                if (_result.length > 0) {
+                  let responses = {
+                    reports: formatResult(_result),
+                    menus: fresult,
+                  };
+                  return createResponse(
+                    res,
+                    SUCCESS_CODE,
+                    payload(SUCCESS_STATUS, responses)
+                  );
+                } else {
+                  return createResponse(
+                    res,
+                    SUCCESS_CODE,
+                    payload(SUCCESS_STATUS, fresult)
+                  );
+                }
+              }
+            });
           }
         });
       } else {
@@ -186,20 +220,59 @@ updateReport = function (req, res) {
     return createResponse(res, ERROR_CODE, payload(ERROR_STATUS, error));
   }
 
-  const { name: ReportName, total: Total } = req.body;
+  const { total: Total, menus } = req.body;
   const id = req.params.id;
+
   let dataSet = {
-    ReportName,
     Total,
   };
 
+  const createData = () => {
+    let menuSet = "";
+    let length = menus.length;
+
+    for (i = 0; i < menus.length; i++) {
+      let row = menus[i];
+
+      menuSet = menuSet.concat(`(${id}, ${row.menuID}, ${row.menuPriceID})`);
+
+      if (i + 1 < length) menuSet = menuSet.concat(", ");
+    }
+
+    return menuSet;
+  };
+
   let query = `UPDATE ${REPORT_TABLE} SET ? WHERE ReportID = ?`;
+  let rmQuery = `UPDATE ReportMenus SET IsActive = 0 WHERE ReportID = ${id}`;
+  let addQuery = `INSERT INTO ReportMenus
+                    (ReportID, MenuID, MenuPriceID)
+                  VALUES
+                    ${createData()}`;
 
   db.query(query, [dataSet, id], (err, result) => {
     if (err) {
+      console.log(err);
       createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
     } else {
-      createResponse(res, SUCCESS_CODE, payload(SUCCESS_STATUS, result));
+      db.query(rmQuery, (i_err, i_result) => {
+        if (i_err) {
+          console.log(i_err);
+          createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+        } else {
+          db.query(addQuery, (ii_err, ii_result) => {
+            if (ii_err) {
+              console.log(ii_err);
+              createResponse(res, ERROR_CODE, payload(ERROR_STATUS, err));
+            } else {
+              createResponse(
+                res,
+                SUCCESS_CODE,
+                payload(SUCCESS_STATUS, ii_result)
+              );
+            }
+          });
+        }
+      });
     }
   });
 };
