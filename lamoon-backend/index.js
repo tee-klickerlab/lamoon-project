@@ -8,9 +8,19 @@ const reportRouter = require("./routes/report");
 const orderRouter = require("./routes/order");
 const { MENU_PATH, ORDERS_PATH, REPORT_PATH } = require("./configs/path");
 
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.SERVER_PORT || 9000;
 
 const app = express();
+
+app.all("/*", function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, content-type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, authorization"
+  );
+  next();
+});
 
 // Middleware
 app.use(express.json());
