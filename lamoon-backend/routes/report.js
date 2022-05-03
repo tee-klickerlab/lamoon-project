@@ -6,22 +6,20 @@ const router = express.Router();
 const validator = require("../common/validators");
 const controller = require("../controllers/reportController");
 
-const {
-  addReport: postValidator,
-  reqParams: paramValidator,
-  updateReport: updateValidator,
-} = validator;
+// destructuring modules
+const { addReportValidator, updateReportValidator, paramsValidator } =
+  validator;
 const { addReport, getReportList, getReport, updateReport, deleteReport } =
   controller;
 
 router.get("/", getReportList);
 
-router.get("/:id", paramValidator, getReport);
+router.get("/:id", paramsValidator, getReport);
 
-router.post("/", postValidator, addReport);
+router.post("/", addReportValidator, addReport);
 
-router.put("/:id", updateValidator, updateReport);
+router.put("/:id", updateReportValidator, updateReport);
 
-router.delete("/:id", paramValidator, deleteReport);
+router.delete("/:id", paramsValidator, deleteReport);
 
 module.exports = router;

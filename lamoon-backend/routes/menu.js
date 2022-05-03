@@ -6,22 +6,19 @@ const router = express.Router();
 const validator = require("../common/validators");
 const controller = require("../controllers/menuController");
 
-const {
-  addMenu: addValidator,
-  updateMenu: updateValidator,
-  reqParams: paramValidator,
-} = validator;
+// destructuring modules
+const { addMenuValidator, updateMenuValidator, paramsValidator } = validator;
 const { addMenu, getMenuList, getMenuById, updateMenu, deleteMenu } =
   controller;
 
 router.get("/", getMenuList);
 
-router.get("/:id", paramValidator, getMenuById);
+router.get("/:id", paramsValidator, getMenuById);
 
-router.post("/", addValidator, addMenu);
+router.post("/", addMenuValidator, addMenu);
 
-router.put("/:id", updateValidator, updateMenu);
+router.put("/:id", updateMenuValidator, updateMenu);
 
-router.delete("/:id", paramValidator, (s = deleteMenu));
+router.delete("/:id", paramsValidator, deleteMenu);
 
 module.exports = router;

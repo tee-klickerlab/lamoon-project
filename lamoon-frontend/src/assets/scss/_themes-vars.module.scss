@@ -1,0 +1,37 @@
+// background
+$paperLight: #fff0e6;
+$paper: #ffdac1;
+
+$appBar: #4d5789;
+
+$textLight: #cca9a6;
+$textMain: #ad7571;
+$textDefault: #979797;
+
+$alertLight: #f5dfdf;
+$alert: #e47070;
+
+$successLight: #d1f1d8;
+$success: #7cc58c;
+
+$view: #242424;
+
+// export
+:export {
+    paper: $paper;
+    paperLight: $paperLight;
+
+    appBar: $appBar;
+
+    textLight: $textLight;
+    textMain: $textMain;
+    textDefault: $textDefault;
+
+    success: $success;
+    successLight: $successLight;
+
+    alert: $alert;
+    alertLight: $alertLight;
+
+    views: $view;
+}

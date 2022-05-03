@@ -1,0 +1,305 @@
+:root {
+  --textLight: #cca9a6;
+  --textMain: #ad7571;
+  --paper: #ffdac1;
+  --paperLight: #fff0e6;
+  --layout: #ffffff;
+  --appBar: #4d5789;
+  --appBarHover: #3e487a;
+  --success: #7cc58c;
+  --error: #e47070;
+}
+
+#root {
+  overflow-x: hidden;
+}
+
+th {
+  font-weight: 500;
+}
+
+body {
+  margin: 0;
+  font-family: "Nunito", "Mitr", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--paper);
+  color: var(--textMain);
+}
+
+.layout {
+  background-color: var(--layout);
+  overflow-y: auto;
+}
+
+.paper {
+  background-color: var(--layout);
+}
+
+.label {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.relative {
+  position: relative;
+}
+
+.management-layout {
+  padding: 16px;
+  font-size: 16px;
+  display: flex;
+}
+
+.report-box {
+  height: 60px;
+  font-family: "Nunito", "Mitr";
+  font-size: 20px;
+  padding: 0px 16px;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--textLight);
+}
+
+.report-box:hover {
+  background-color: var(--paperLight);
+}
+
+.d-flex {
+  display: flex;
+}
+
+.default-button {
+  padding: 8px 6px;
+  min-width: 200px;
+  opacity: 0.8;
+  transition: 0.3s;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  color: var(--layout);
+}
+
+.default-button:hover {
+  opacity: 1;
+}
+
+.icon-button {
+  width: 35px;
+  height: 35px;
+  opacity: 0.8;
+  transition: 0.3s;
+  border-radius: 50%;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  border: none;
+  color: var(--layout);
+}
+
+.icon-button:hover {
+  opacity: 1;
+}
+
+.add-button {
+  width: 70px;
+  height: 70px;
+  transition: 0.2s;
+  border-radius: 50%;
+  cursor: pointer;
+  right: 12px;
+  bottom: 12px;
+  position: absolute;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--layout);
+  background-color: var(--appBar);
+}
+
+.add-button:hover {
+  background-color: var(--appBarHover);
+}
+
+.margin-right-2 {
+  margin-right: 16px;
+}
+
+.margin-right-3 {
+  margin-right: 24px;
+}
+
+.margin-right-4 {
+  margin-right: 32px;
+}
+
+.title {
+  padding: 6px 12px;
+  font-size: 28px;
+}
+
+.table-head {
+  padding: 6px 12px;
+  border: 1px solid var(--textLight);
+  border-left: none;
+  border-right: none;
+  background-color: var(--paperLight);
+  color: var(--textLight);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+
+.table-row {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--textLight);
+  font-size: 24px;
+  display: flex;
+  align-content: center;
+  transition: 0.3s;
+}
+
+.table-row:hover {
+  background-color: var(--paperLight);
+}
+
+.textfield {
+  width: 100%;
+  transition: 0.3s;
+  border: 1px solid var(--textLight);
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 20px;
+  font-family: inherit;
+  max-width: 550px;
+  color: var(--textMain);
+}
+
+.textfield:focus {
+  outline: 1px solid var(--textMain);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  font-size: 18px;
+  background-color: var(--paperLight);
+  color: var(--textLight);
+  border-top: var(--textLight) 1px solid;
+  border-bottom: var(--textLight) 1px solid;
+  padding: 6px 12px;
+}
+
+.tr {
+  border-bottom: 1px solid var(--textLight);
+  font-size: 24px;
+  transition: 0.2s;
+}
+
+.active {
+  background-color: var(--paperLight);
+}
+
+.td {
+  padding: 12px 16px;
+  background-color: transparent;
+}
+
+.menu-column {
+  align-items: center;
+}
+
+.ml-05 {
+  margin-left: 0.5rem;
+}
+
+.ml-10 {
+  margin-left: 1rem;
+}
+
+.fw-600 {
+  font-weight: 600;
+}
+
+.x-hidden {
+  overflow-x: hidden !important;
+}
+
+.each-menu {
+  max-width: 120px;
+  min-width: 80px;
+  width: fit-content;
+  padding: 6px 0px !important;
+}
+
+.each-row {
+  max-width: 120px;
+  min-width: 80px;
+  width: fit-content;
+  padding: 10px 0px;
+}
+
+.tr .each-menu {
+  font-weight: 600;
+}
+
+.tr .each-row {
+  font-weight: 600;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.add-order {
+  padding: 1px;
+  margin-left: 8px;
+  height: 30px;
+  border-radius: 4px;
+  border: var(--textMain) 1.5px solid;
+  color: var(--textMain);
+  background-color: var(--paperLight);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: 0.4s;
+}
+
+.add-order:hover {
+  opacity: 1;
+}
+
+.mb-10 {
+  margin-bottom: 1rem !important;
+}
+
+.MuiAlert-standard {
+  background-color: var(--layout) !important;
+  color: var(--textMain) !important;
+  font-family: inherit;
+}
+
+.report-title {
+  font-weight: 600;
+}
+
+.ml-15 {
+  margin-left: 1.5rem;
+}
+
+.mr-15 {
+  margin-right: 1.5rem;
+}
